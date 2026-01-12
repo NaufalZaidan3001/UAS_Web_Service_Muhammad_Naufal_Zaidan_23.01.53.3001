@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Login & Register -->
+        <div id="loginPage" class="page active">
+            <div class="container"><div class="form-container"><h1>🍽️ Masuk</h1><form id="loginForm"><input type="email" id="loginEmail" placeholder="Email" required><input type="password" id="loginPassword" placeholder="Password" required><button type="submit" class="btn btn-primary">Masuk</button><p>Belum punya akun? <a href="#" onclick="showRegister()">Daftar</a></p></form></div></div>
+        </div>
+        <div id="registerPage" class="page">
+            <div class="container"><div class="form-container"><h1>Daftar</h1><form id="registerForm"><input type="text" id="regName" placeholder="Nama" required><input type="email" id="regEmail" placeholder="Email" required><input type="password" id="regPassword" placeholder="Password" required><input type="tel" id="regPhone" placeholder="No HP" required><textarea id="regAddress" placeholder="Alamat Lengkap" rows="2" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:4px;" required></textarea><button type="submit" class="btn btn-primary">Daftar</button><p>Sudah punya akun? <a href="#" onclick="showLogin()">Masuk</a></p></form></div></div>
+        </div>
+
+        <!-- Main Page -->
+        <div id="mainPage" class="page">
+            <header class="header">
+                <div class="container">
+                    <h1>🍽️ Restaurant Ordering</h1>
+                    <div class="header-actions">
+                        <span id="userNameDisplay">User</span>
+                        <button class="btn btn-small" onclick="showCart()">🛒 Cart</button>
+                        <button class="btn btn-small" onclick="showOrders()">📦 Pesanan</button>
+                        <button class="btn btn-danger btn-small" onclick="logout()">Keluar</button>
+                    </div>
+                </div>
+            </header>
+
+            <div id="adminDashboard" class="container dashboard-panel admin-panel hidden">
+                <h3>🛡️ Admin Dashboard</h3>
+                <button class="btn btn-primary" onclick="showAdminUsers()">👥 Kelola Users</button>
+                <div id="adminContent" class="hidden" style="margin-top:15px; background:white; padding:10px;"></div>
+            </div>
+
+            <div id="ownerDashboard" class="container dashboard-panel hidden">
+                <h3>👑 Menu Pemilik Restoran</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="showCreateRestaurantForm()">+ Buat Restoran</button>
+                    <button class="btn btn-secondary" onclick="showOwnerOrders()">📦 Pesanan Masuk</button>
+                </div>
+            </div>
+
+            <div class="container">
+                <input type="text" id="searchRestaurant" placeholder="Cari restoran..." style="width:100%; padding:10px; margin-bottom:20px;" onkeyup="loadRestaurants(this.value)">
+                <div id="restaurantsList" class="restaurants-grid"></div>
+            </div>
+        </div>
+
+        <!-- Detail Page -->
+        <div id="restaurantPage" class="page">
+            <header class="header">
+                <div class="container"><button class="btn btn-small" onclick="goBack()">← Kembali</button><span id="restaurantName">Detail</span><button class="btn btn-small" onclick="showCart()">🛒 Cart</button></div>
+            </header>
+            <div class="container">
+                <div id="restaurantInfo" class="dashboard-panel" style="background:white; border:none;"></div>
+                <h3>Menu Makanan</h3>
+                <div id="menuItems" class="menu-grid"></div>
+                <div id="restaurantReviews" class="reviews-section hidden"><h3>Ulasan Pelanggan</h3></div>
+            </div>
+        </div>
+
+        <!-- Cart Page (REVISI LAYOUT & REALTIME) -->
+        <div id="cartPage" class="page">
+            <header class="header">
+                <div class="container">
+                    <button class="btn btn-small" onclick="goBack()">← Kembali</button>
+                    <h2>🛒 Keranjang Belanja</h2>
+                </div>
+            </header>
+
+            <div class="container">
+                <div id="cartItems" style="background:white; border-radius:8px; overflow:hidden; margin-bottom:20px;">
+                    <!-- Items will be injected here -->
+                </div>
+
+                <div id="cartSummary" class="cart-summary">
+                    <h3>Rincian Pembayaran</h3>
+                    
+                    <div class="summary-row">
+                        <span>Subtotal Makanan:</span>
+                        <span id="subtotal" data-value="0">Rp 0</span>
+                    </div>
+                    
+                    <div class="summary-row" style="align-items: center;">
+                        <span>Ongkos Kirim (Rp):</span>
+                        <!-- Input type number agar lebih valid untuk kalkulasi -->
+                        <input type="number" id="deliveryFee" value="5000" min="0" step="1000" style="width:120px; text-align:right;">
+                    </div>
+                    
+                    <div class="summary-row total" style="font-size: 1.2em; margin-top:10px; padding-top:10px; border-top:2px dashed #ddd;">
+                        <span>Total Bayar:</span>
+                        <span id="totalPrice" style="color:#ff6b35;">Rp 0</span>
+                    </div>
+                    
+                    <hr style="margin: 20px 0; border:0; border-top:1px solid #eee;">
+                    
+                    <!-- Form Input Terpisah -->
+                    <div class="form-group">
+                        <label for="orderNotes">Catatan Pesanan (Opsional)</label>
+                        <textarea id="orderNotes" rows="2" placeholder="Contoh: Jangan terlalu pedas, minta sendok plastik..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deliveryAddress">Alamat Pengiriman (Wajib)</label>
+                        <textarea id="deliveryAddress" rows="3" placeholder="Jalan, Nomor Rumah, RT/RW, Patokan..." required style="border:1px solid #ff6b35;"></textarea>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-full" style="padding:15px; font-size:16px; margin-top:10px;" onclick="checkout()">
+                        ✅ Buat Pesanan Sekarang
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Orders Page -->
+        <div id="ordersPage" class="page">
+            <header class="header"><div class="container"><button class="btn btn-small" onclick="goBack()">← Kembali</button><h2>📋 Pesanan Saya</h2></div></header>
+            <div class="container"><div id="ordersList"></div></div>
+        </div>
+
+        <!-- Order Detail Page -->
+        <div id="orderDetailPage" class="page">
+            <header class="header"><div class="container"><button class="btn btn-small" onclick="goBack()">← Kembali</button><h2>Detail Pesanan #<span id="orderDetailId"></span></h2></div></header>
+            <div class="container"><div id="orderDetailContent"></div></div>
+        </div>
+
+        <!-- MODAL: ADD/EDIT RESTAURANT -->
+        <div id="restaurantModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal('restaurantModal')">&times;</span>
+                <h2 id="restaurantModalTitle">Restoran Baru</h2>
+                <form id="restaurantForm">
+                    <input type="hidden" id="editRestaurantId">
+                    <div class="form-group"><label>Nama Restoran</label><input type="text" id="restName" required></div>
+                    <div class="form-group"><label>Alamat</label><textarea id="restAddress" rows="2" required></textarea></div>
+                    <div class="form-group"><label>Jam Operasional</label><div style="display:flex; gap:10px;"><input type="time" id="restOpenTime" required><span>s/d</span><input type="time" id="restCloseTime" required></div></div>
+                    <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('restaurantModal')">Batal</button><button type="submit" class="btn btn-primary">Simpan</button></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL: ADD MENU -->
+        <div id="menuModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal('menuModal')">&times;</span>
+                <h2>Tambah Menu</h2>
+                <form id="menuForm">
+                    <input type="hidden" id="menuRestaurantId">
+                    <div class="form-group"><label>Nama Menu</label><input type="text" id="menuName" required></div>
+                    <div class="form-group"><label>Deskripsi</label><textarea id="menuDesc" rows="2"></textarea></div>
+                    <div class="form-group"><label>Harga</label><input type="number" id="menuPrice" required></div>
+                    <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('menuModal')">Batal</button><button type="submit" class="btn btn-primary">Simpan</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
