@@ -11,6 +11,19 @@ class Restaurants extends ResourceController
     protected $format    = 'json';
 
     /**
+     * Handle Preflight Request (OPTIONS)
+     * Penting untuk mengatasi error CORS
+     */
+    public function options()
+    {
+        return $this->response
+            ->setHeader('Access-Control-Allow-Origin', '*') 
+            ->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
+            ->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+            ->setStatusCode(200);
+    }
+
+    /**
      * GET /api/v1/restaurants
      * Return all restaurants
      */
@@ -22,12 +35,15 @@ class Restaurants extends ResourceController
             return $this->respond([
                 'status' => 'success',
                 'data' => $restaurants
-            ], ResponseInterface::HTTP_OK);
+            ], ResponseInterface::HTTP_OK)
+            ->setHeader('Access-Control-Allow-Origin', '*'); // Tambahkan header ini
+
         } catch (\Exception $e) {
             return $this->respond([
                 'status' => 'error',
                 'message' => $e->getMessage()
-            ], ResponseInterface::HTTP_INTERNAL_SERVER_ERROR);
+            ], ResponseInterface::HTTP_INTERNAL_SERVER_ERROR)
+            ->setHeader('Access-Control-Allow-Origin', '*');
         }
     }
 
@@ -44,18 +60,22 @@ class Restaurants extends ResourceController
                 return $this->respond([
                     'status' => 'error',
                     'message' => 'Restaurant not found'
-                ], ResponseInterface::HTTP_NOT_FOUND);
+                ], ResponseInterface::HTTP_NOT_FOUND)
+                ->setHeader('Access-Control-Allow-Origin', '*');
             }
 
             return $this->respond([
                 'status' => 'success',
                 'data' => $restaurant
-            ], ResponseInterface::HTTP_OK);
+            ], ResponseInterface::HTTP_OK)
+            ->setHeader('Access-Control-Allow-Origin', '*');
+
         } catch (\Exception $e) {
             return $this->respond([
                 'status' => 'error',
                 'message' => $e->getMessage()
-            ], ResponseInterface::HTTP_INTERNAL_SERVER_ERROR);
+            ], ResponseInterface::HTTP_INTERNAL_SERVER_ERROR)
+            ->setHeader('Access-Control-Allow-Origin', '*');
         }
     }
 
@@ -79,7 +99,8 @@ class Restaurants extends ResourceController
                     'status' => 'error',
                     'message' => 'Validation failed',
                     'errors' => $this->validator->getErrors()
-                ], ResponseInterface::HTTP_BAD_REQUEST);
+                ], ResponseInterface::HTTP_BAD_REQUEST)
+                ->setHeader('Access-Control-Allow-Origin', '*');
             }
 
             $id = $this->model->insert($data);
@@ -88,12 +109,15 @@ class Restaurants extends ResourceController
                 'status' => 'success',
                 'message' => 'Restaurant created successfully',
                 'data' => $this->model->find($id)
-            ], ResponseInterface::HTTP_CREATED);
+            ], ResponseInterface::HTTP_CREATED)
+            ->setHeader('Access-Control-Allow-Origin', '*');
+
         } catch (\Exception $e) {
             return $this->respond([
                 'status' => 'error',
                 'message' => $e->getMessage()
-            ], ResponseInterface::HTTP_INTERNAL_SERVER_ERROR);
+            ], ResponseInterface::HTTP_INTERNAL_SERVER_ERROR)
+            ->setHeader('Access-Control-Allow-Origin', '*');
         }
     }
 
@@ -108,7 +132,8 @@ class Restaurants extends ResourceController
                 return $this->respond([
                     'status' => 'error',
                     'message' => 'Restaurant not found'
-                ], ResponseInterface::HTTP_NOT_FOUND);
+                ], ResponseInterface::HTTP_NOT_FOUND)
+                ->setHeader('Access-Control-Allow-Origin', '*');
             }
 
             $data = $this->request->getJSON();
@@ -118,12 +143,15 @@ class Restaurants extends ResourceController
                 'status' => 'success',
                 'message' => 'Restaurant updated successfully',
                 'data' => $this->model->find($id)
-            ], ResponseInterface::HTTP_OK);
+            ], ResponseInterface::HTTP_OK)
+            ->setHeader('Access-Control-Allow-Origin', '*');
+
         } catch (\Exception $e) {
             return $this->respond([
                 'status' => 'error',
                 'message' => $e->getMessage()
-            ], ResponseInterface::HTTP_INTERNAL_SERVER_ERROR);
+            ], ResponseInterface::HTTP_INTERNAL_SERVER_ERROR)
+            ->setHeader('Access-Control-Allow-Origin', '*');
         }
     }
 
@@ -138,7 +166,8 @@ class Restaurants extends ResourceController
                 return $this->respond([
                     'status' => 'error',
                     'message' => 'Restaurant not found'
-                ], ResponseInterface::HTTP_NOT_FOUND);
+                ], ResponseInterface::HTTP_NOT_FOUND)
+                ->setHeader('Access-Control-Allow-Origin', '*');
             }
 
             $this->model->delete($id);
@@ -146,12 +175,15 @@ class Restaurants extends ResourceController
             return $this->respond([
                 'status' => 'success',
                 'message' => 'Restaurant deleted successfully'
-            ], ResponseInterface::HTTP_OK);
+            ], ResponseInterface::HTTP_OK)
+            ->setHeader('Access-Control-Allow-Origin', '*');
+
         } catch (\Exception $e) {
             return $this->respond([
                 'status' => 'error',
                 'message' => $e->getMessage()
-            ], ResponseInterface::HTTP_INTERNAL_SERVER_ERROR);
+            ], ResponseInterface::HTTP_INTERNAL_SERVER_ERROR)
+            ->setHeader('Access-Control-Allow-Origin', '*');
         }
     }
 }
