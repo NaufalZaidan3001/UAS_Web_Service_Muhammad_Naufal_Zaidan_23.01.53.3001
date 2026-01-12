@@ -7,22 +7,28 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
-/*
- * --------------------------------------------------------------------
- * API Routes
- * --------------------------------------------------------------------
- */
-// Perhatikan namespace: App\Controllers\Api
+// API Routes
 $routes->group('api/v1', ['namespace' => 'App\Controllers\Api'], function ($routes) {
     
-    // 1. Handle Preflight Request (OPTIONS) untuk CORS
-    // Menangkap semua request OPTIONS di bawah api/v1/...
-    $routes->options('(:any)', 'Restaurants::options');
+    // Handle OPTIONS request (CORS Preflight) untuk semua endpoint
+    $routes->options('(:any)', 'Restaurants::options'); // Default handler
 
-    // 2. Resource Routes untuk Restaurants
-    // Ini otomatis membuat route GET, POST, PUT, DELETE
-    $routes->resource('restaurants');
+    // 1. Restaurants
+    $routes->resource('restaurants', ['controller' => 'Restaurants']);
     
-    // Jika Anda punya controller Orders atau lainnya, tambahkan di sini:
-    // $routes->resource('orders');
+    // 2. Menus (Custom Route)
+    $routes->get('restaurants/(:num)/menus', 'Menus::getByRestaurant/$1');
+    $routes->options('restaurants/(:num)/menus', 'Menus::options');
+
+    // 3. Customers
+    $routes->post('customers', 'Customers::create');
+    $routes->options('customers', 'Customers::options');
+
+    // 4. Orders
+    $routes->post('orders', 'Orders::create');
+    $routes->options('orders', 'Orders::options');
+    
+    // 5. Track Order by Email
+    $routes->get('customers/email/(:any)/orders', 'Orders::getByEmail/$1');
+    $routes->options('customers/email/(:any)/orders', 'Orders::options');
 });
