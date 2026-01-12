@@ -7,12 +7,22 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
-// Grup route untuk API v1
-$routes->group('api/v1', ['namespace' => 'App\Controllers\Api'], function($routes) {
-    // Tambahkan header CORS untuk semua request di dalam grup ini
-    $routes->options('(:any)', 'RestaurantsController::options'); // Handle preflight request
+/*
+ * --------------------------------------------------------------------
+ * API Routes
+ * --------------------------------------------------------------------
+ */
+// Perhatikan namespace: App\Controllers\Api
+$routes->group('api/v1', ['namespace' => 'App\Controllers\Api'], function ($routes) {
     
-    // Definisikan resource routes
-    $routes->resource('restaurants', ['controller' => 'RestaurantsController']);
-    $routes->resource('orders', ['controller' => 'OrdersController']); // Jika ada
+    // 1. Handle Preflight Request (OPTIONS) untuk CORS
+    // Menangkap semua request OPTIONS di bawah api/v1/...
+    $routes->options('(:any)', 'Restaurants::options');
+
+    // 2. Resource Routes untuk Restaurants
+    // Ini otomatis membuat route GET, POST, PUT, DELETE
+    $routes->resource('restaurants');
+    
+    // Jika Anda punya controller Orders atau lainnya, tambahkan di sini:
+    // $routes->resource('orders');
 });
